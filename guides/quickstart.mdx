@@ -1,0 +1,17 @@
+---
+title: "Quickstart"
+description: "Call email validation with an API key."
+---
+
+routr is one HTTP API for contact-data checks. An agent sends a key, a routing mode, and the address. routr returns one verdict.
+
+```bash
+curl https://api.routr.to/v1/email/validate \
+  -H "Authorization: Bearer rtr_test_your_key" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"jane@example.com\",\"routing\":{\"mode\":\"smart\"}}"
+```
+
+The response has `result.verdict`, `result.disposable`, and `result.role`. `disposable` and `role` are null when the vendor did not say. `credits_charged` and `credits_remaining` tell you what the call cost and what is left.
+
+`GET /v1/capabilities` lists every capability, its verdicts, and its integrations. It does not need a key.

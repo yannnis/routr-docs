@@ -1,0 +1,12 @@
+---
+title: "Versioning"
+description: "What can change in /v1, and when /v2 starts."
+---
+
+`/v1` only changes in ways that do not break a caller: new response fields, new optional request fields, new integrations, new capabilities, and new error codes for new situations.
+
+A breaking change removes or renames a field, changes a field's type, adds, removes, or renames a verdict, changes an existing error code, or changes a default. A breaking change ships as `/v2`.
+
+From the day `/v2` ships, `/v1` responses carry `Deprecation` and `Sunset` headers. `/v1` keeps working for 6 months.
+
+Before launch, nothing is deployed and `/v1` may still change. The error body, `credits_remaining`, `stop_reason`, and `steps[].reason` arrived this way.

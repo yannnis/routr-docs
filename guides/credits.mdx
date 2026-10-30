@@ -1,0 +1,18 @@
+---
+title: "Credits"
+description: "How a call is reserved, charged, and replayed."
+---
+
+Each capability has a charge rule: `sum`, `resolver`, or `max`. `email.validate` uses `sum`. Every step that returns a verdict is charged. A step that errors or times out costs nothing, including a step cut short by `timeout_ms`.
+
+Placeholder prices until vendor costs are known: NeverBounce 2, Bouncer 2, ZeroBounce 3. The most a smart, cheapest, or fully pinned call can cost is 7 credits.
+
+routr reserves that amount before the first vendor call. If the balance is lower, the call is `402` and nothing is reserved. After the call, the unused part of the reservation is released.
+
+`credits_remaining` is the account balance right after the call settled. A replay returns the value from the first response.
+
+`GET /v1/capabilities` returns `worst_case_credits` for `smart`, `cheapest`, and `pinned`. That is the most one call can cost in that mode before `max_credits` lowers it. For `email.validate` each mode is 7. `timeout_ms` does not change it.
+
+Send `Idempotency-Key` to make a retry safe. The same key and the same body within 24 hours return the first response, including the original `credits_charged`, and do not charge again. The same key and a different body within 24 hours is `409`.
+
+A cache hit costs nothing. This version does not serve cached results.

@@ -1,0 +1,50 @@
+---
+title: "Errors"
+description: "Status codes an agent can branch on."
+---
+
+Every error raised by routr code returns this body:
+
+```json
+{
+  "error": {
+    "code": "insufficient_credits",
+    "message": "The balance is below the most this call can cost.",
+    "retryable": false
+  }
+}
+```
+
+Branch on `code`. `message` can change between releases.
+
+| Status | Code | Retryable | Retry-After | Charged |
+| --- | --- | --- | --- | --- |
+| 400 | `invalid_input` | false | none | No |
+| 400 | `unknown_integration` | false | none | No |
+| 401 | `unauthorized` | false | none | No |
+| 401 | `session_required` | false | none | No |
+| 404 | `account_not_found` | false | none | No |
+| 402 | `insufficient_credits` | false | none | No |
+| 409 | `idempotency_conflict` | false | none | No |
+| 500 | `internal_error` | true | none | No |
+| 502 | `upstream_error` | true | 5 | No |
+| 503 | `no_integration_available` | true | 30 | No |
+| 404 | `playground_key_not_found` | false | none | No |
+| 429 | `rate_limited` | true | set per response | No |
+
+`Retry-After` is in seconds. `retryable` is true when the same request can succeed later without changes. `rate_limited` is the one code whose `Retry-After` is chosen per response. It is only returned by `POST /account/playground-keys`.
+
+`steps[].error` is null when the step returned a verdict. Otherwise it is one of:
+
+| Error | Meaning |
+| --- | --- |
+| `timeout` | The vendor did not answer within the integration's timeout. |
+| `http_<status>` | The vendor returned a non-2xx status, for example `http_429`. |
+| `vendor_error` | The vendor body carried an error, or had no status. |
+| `vendor_<status>` | The vendor reported its own failure status with HTTP 200, for example `vendor_auth_failure`. |
+| `invalid_response` | The vendor body was not the JSON we expect. |
+| `unmapped_verdict` | Our mapping produced a verdict the capability does not declare. |
+| `key_not_redacted` | The request was refused before sending because the API key would have appeared in logs. |
+| `circuit_open` | The integration failed 3 times recently and is paused for 30 seconds. |
+
+A step with an error is never charged.

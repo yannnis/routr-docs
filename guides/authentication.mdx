@@ -1,0 +1,12 @@
+---
+title: "Authentication"
+description: "Send a routr API key on every charged call."
+---
+
+Send `Authorization: Bearer` and a key that starts with `rtr_live_` or `rtr_test_`.
+
+A missing, malformed, unknown, or revoked key is `401` with error code `unauthorized`. The body does not say which of those it was.
+
+routr stores the SHA-256 of the key. Logs contain the first 12 characters of the key, not the key itself.
+
+`GET /v1/capabilities` and `GET /health` do not need a key.

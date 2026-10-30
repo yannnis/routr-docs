@@ -1,0 +1,20 @@
+---
+title: "Data"
+description: "What routr stores, where it goes, and how long it stays."
+---
+
+| Where | What | How long |
+| --- | --- | --- |
+| The vendors in the plan | The address, sent to each vendor that runs | The vendor's own terms. Listed once vendor accounts exist |
+| Accounts | The name from sign-up or the provider, what they heard, the agent they picked, and the client they connected. No email address | Kept with the account |
+| API keys | The key name. The secret is not stored | Kept with the account |
+| Call log | A SHA-256 hash of the normalized input and routing, the steps, credits, latency, status, `stop_reason`, and the API key id. No address. Rows written before `stop_reason` was stored have it empty | 13 months |
+| Solo hit counts | One row per capability, integration, and UTC day: smart first-step calls that reached the vendor, and how many were conclusive. No account, call, key, or input | 90 days |
+| Integration health counts | One row per integration and UTC minute: steps that reached the vendor, and how many errored. No account, call, key, or input | Read over 60 minutes. Rows deleted after 2 hours |
+| Playground keys | Hash, 12-character prefix, name `Dashboard playground`, and expiry. The secret is not stored | 13 months after expiry |
+| This browser tab | The request and response of playground runs | Until reload or the tab closes. Not stored in the browser |
+| Idempotency keys | A hash of the request body and the response. The response holds no address | 24 hours |
+| Application logs | No addresses and no keys. Key prefix and hashes only | 30 days |
+| Error reports | Sentry, with addresses, keys, and request bodies removed | Sentry plan default |
+
+A hash of an address is still personal data under GDPR, and routr treats it as such.

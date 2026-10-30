@@ -1,0 +1,33 @@
+---
+title: "Routing"
+description: "Choose smart, cheapest, or pinned for each call."
+---
+
+Set `routing.mode` on the request. The default is `smart`.
+
+| Mode | Order | Stops when |
+| --- | --- | --- |
+| `smart` | Highest solo hit rate, then lowest credit price, then integration id | A conclusive verdict, or the order ends |
+| `cheapest` | Lowest credit price, then integration id | A conclusive verdict |
+| `pinned` | The `routing.integrations` list, in that order | A conclusive verdict, or the end of the list |
+
+`fallback: true` continues with the other vendors in smart order after the caller's list. A pinned call still stops at the first conclusive verdict, and it continues when the verdict is not conclusive.
+
+`max_credits` stops the plan before a step that would exceed the cap. It does not skip that step and keep going.
+
+`timeout_ms` is optional. Omit it and each vendor uses its own timeout. Set it to a whole number of milliseconds, at least 1, and each vendor waits that long or its own timeout, whichever is shorter. When the time is up, that step is not charged, it is not counted for the hit rate or health, and the next vendor runs. Example: `3000`.
+
+For `email.validate`, conclusive verdicts are `deliverable` and `undeliverable`. `catch_all` and `unknown` are not conclusive, so `smart`, `cheapest`, and `pinned` continue.
+
+| Step reason | When |
+| --- | --- |
+| `first` | The first step of the plan. |
+| `previous_inconclusive` | The step before returned a verdict that is not conclusive. |
+| `previous_failed` | The step before errored, timed out, or had an open circuit breaker. |
+| `fallback` | The caller set `fallback: true` and this vendor was not in the pinned list. Takes precedence over the two above. |
+
+| Stop reason | When |
+| --- | --- |
+| `conclusive` | A step returned a conclusive verdict. `resolved_by` names it. |
+| `max_credits` | Another step would have run, but `max_credits` removed it from the plan. |
+| `plan_end` | No further step applies: the order or list ended, or the call budget could not fit another step. |

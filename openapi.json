@@ -1,0 +1,523 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Routr",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.routr.to"
+    }
+  ],
+  "paths": {
+    "/v1/capabilities": {
+      "get": {
+        "operationId": "ListCapabilitiescapabilities_Get",
+        "summary": "Lists every capability, its verdicts, and its integrations.",
+        "description": "Lists every capability, its verdicts, and its integrations.",
+        "tags": [
+          "v1"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCapabilitiesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/email/validate": {
+      "post": {
+        "operationId": "email.validate",
+        "summary": "Says whether an email address can receive mail.",
+        "description": "Says whether an email address can receive mail.",
+        "tags": [
+          "v1"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailValidate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailValidateResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "Health_Get",
+        "summary": "Process is up.",
+        "description": "Process is up.",
+        "tags": [
+          "health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailValidate": {
+        "title": "EmailValidate",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "routing": {
+            "$ref": "#/components/schemas/CapabilityRouting"
+          },
+          "max_credits": {
+            "description": "Stop the plan before a step that would exceed this many credits.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeout_ms": {
+            "description": "How long each vendor may take, in milliseconds. When the time is up, routr tries the next vendor and does not charge for that step. Omit it to use each vendor\u0027s own timeout. Example: 3000.",
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "Says whether an email address can receive mail.",
+        "type": "object"
+      },
+      "CapabilityRouting": {
+        "title": "CapabilityRouting",
+        "properties": {
+          "mode": {
+            "description": "smart, cheapest, or pinned. Default smart.",
+            "type": "string"
+          },
+          "integrations": {
+            "description": "Integration IDs. Required when mode is pinned.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "bouncer",
+                "neverbounce",
+                "zerobounce"
+              ]
+            }
+          },
+          "fallback": {
+            "description": "When pinned, continue with the other vendors in smart order after the caller\u0027s list.",
+            "type": "boolean"
+          }
+        },
+        "description": "CapabilityRouting",
+        "type": "object"
+      },
+      "WorstCaseCredits": {
+        "title": "WorstCaseCredits",
+        "properties": {
+          "smart": {
+            "description": "Most credits a call can cost in this mode.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "cheapest": {
+            "description": "Most credits a call can cost in this mode.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "pinned": {
+            "description": "Most credits a call can cost in this mode.",
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "WorstCaseCredits",
+        "type": "object"
+      },
+      "Dictionary_String_String_": {
+        "title": "Dictionary\u003CString,String\u003E",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Dictionary\u003CString,String\u003E",
+        "type": "object"
+      },
+      "ObjectSchema": {
+        "title": "ObjectSchema",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "required": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "properties": {
+            "$ref": "#/components/schemas/Dictionary_String_PropertySchema_"
+          }
+        },
+        "description": "ObjectSchema",
+        "type": "object"
+      },
+      "PropertySchema": {
+        "title": "PropertySchema",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "description": "PropertySchema",
+        "type": "object"
+      },
+      "Dictionary_String_PropertySchema_": {
+        "title": "Dictionary\u003CString,PropertySchema\u003E",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/PropertySchema"
+        },
+        "description": "Dictionary\u003CString,PropertySchema\u003E",
+        "type": "object"
+      },
+      "CapabilityExampleInfo": {
+        "title": "CapabilityExampleInfo",
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/Dictionary_String_String_"
+          },
+          "verdict": {
+            "type": "string"
+          }
+        },
+        "description": "CapabilityExampleInfo",
+        "type": "object"
+      },
+      "InputGroupInfo": {
+        "title": "InputGroupInfo",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "InputGroupInfo",
+        "type": "object"
+      },
+      "ListCapabilitiesResponse": {
+        "title": "ListCapabilitiesResponse",
+        "properties": {
+          "capabilities": {
+            "description": "Capabilities an agent can call.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapabilityInfo"
+            }
+          }
+        },
+        "description": "ListCapabilitiesResponse",
+        "type": "object"
+      },
+      "CapabilityInfo": {
+        "title": "CapabilityInfo",
+        "properties": {
+          "id": {
+            "description": "Capability ID, noun.verb.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Short name.",
+            "type": "string"
+          },
+          "summary": {
+            "description": "One sentence an agent can use to decide whether to call this.",
+            "type": "string"
+          },
+          "endpoint": {
+            "description": "REST path and method.",
+            "type": "string"
+          },
+          "mcp_tool": {
+            "description": "MCP tool name.",
+            "type": "string"
+          },
+          "cli": {
+            "description": "CLI command.",
+            "type": "string"
+          },
+          "charge": {
+            "description": "sum, resolver, or max.",
+            "type": "string"
+          },
+          "worst_case_credits": {
+            "$ref": "#/components/schemas/WorstCaseCredits"
+          },
+          "verdicts": {
+            "$ref": "#/components/schemas/Dictionary_String_String_"
+          },
+          "integrations": {
+            "description": "Integrations that can serve this capability.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationInfo"
+            }
+          },
+          "input_schema": {
+            "$ref": "#/components/schemas/ObjectSchema"
+          },
+          "result_schema": {
+            "$ref": "#/components/schemas/ObjectSchema"
+          },
+          "examples": {
+            "description": "Example inputs and the verdict each one returns.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapabilityExampleInfo"
+            }
+          },
+          "input_groups": {
+            "description": "Groups of fields. The request is valid when every field of one group is present.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InputGroupInfo"
+            }
+          },
+          "primary_field": {
+            "description": "The field the form should lead with, when it is not the first required string.",
+            "type": "string"
+          }
+        },
+        "description": "CapabilityInfo",
+        "type": "object"
+      },
+      "IntegrationInfo": {
+        "title": "IntegrationInfo",
+        "properties": {
+          "id": {
+            "description": "Integration ID.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Vendor name.",
+            "type": "string"
+          },
+          "summary": {
+            "description": "What this integration is used for.",
+            "type": "string"
+          },
+          "credits": {
+            "description": "Credits charged when this integration returns a verdict.",
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "IntegrationInfo",
+        "type": "object"
+      },
+      "EmailValidateResponse": {
+        "title": "EmailValidateResponse",
+        "properties": {
+          "id": {
+            "description": "Call ID. The same ID is returned when an Idempotency-Key is replayed.",
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/EmailValidateResult"
+          },
+          "resolved_by": {
+            "description": "Integration that produced a conclusive verdict. Null when none did.",
+            "type": "string"
+          },
+          "steps": {
+            "description": "Steps that ran, in order.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapabilityStep"
+            }
+          },
+          "credits_charged": {
+            "description": "Credits charged for this call. A replay returns the original value.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "cached": {
+            "description": "True when the result was served from the cache. Always false in this version.",
+            "type": "boolean"
+          },
+          "credits_remaining": {
+            "description": "Account balance right after this call settled. A replay returns the value from the first response.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "stop_reason": {
+            "description": "Why the call stopped: conclusive, plan_end, or max_credits.",
+            "type": "string"
+          },
+          "response_status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          }
+        },
+        "description": "EmailValidateResponse",
+        "type": "object"
+      },
+      "EmailValidateResult": {
+        "title": "EmailValidateResult",
+        "properties": {
+          "verdict": {
+            "description": "deliverable, undeliverable, catch_all, or unknown.",
+            "type": "string"
+          },
+          "disposable": {
+            "description": "True when the address is disposable. Null when the vendor did not say.",
+            "type": "boolean"
+          },
+          "role": {
+            "description": "True when the address is a role mailbox such as info@ or sales@. Null when the vendor did not say.",
+            "type": "boolean"
+          }
+        },
+        "description": "EmailValidateResult",
+        "type": "object"
+      },
+      "CapabilityStep": {
+        "title": "CapabilityStep",
+        "properties": {
+          "integration": {
+            "description": "Integration that ran this step.",
+            "type": "string"
+          },
+          "verdict": {
+            "description": "Verdict from this step, when it returned one.",
+            "type": "string"
+          },
+          "credits": {
+            "description": "Credits charged for this step. Zero when the step errored.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "ms": {
+            "description": "How long this step took, in milliseconds.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "description": "Step error code, when the vendor did not return a verdict.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why this step ran: first, previous_inconclusive, previous_failed, or fallback.",
+            "type": "string"
+          }
+        },
+        "description": "CapabilityStep",
+        "type": "object"
+      },
+      "ResponseStatus": {
+        "title": "ResponseStatus",
+        "properties": {
+          "error_code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "stack_trace": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResponseError"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Dictionary_String_String_"
+          }
+        },
+        "description": "ResponseStatus",
+        "type": "object"
+      },
+      "ResponseError": {
+        "title": "ResponseError",
+        "properties": {
+          "error_code": {
+            "type": "string"
+          },
+          "field_name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Dictionary_String_String_"
+          }
+        },
+        "description": "ResponseError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "title": "HealthResponse",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "description": "HealthResponse",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API key. Send Authorization: Bearer rtr_live_\u2026 or rtr_test_\u2026"
+      }
+    }
+  }
+}

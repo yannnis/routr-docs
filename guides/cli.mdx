@@ -1,0 +1,27 @@
+---
+title: "CLI"
+description: "Call email validation from the command line."
+---
+
+`routr email validate` calls `POST /v1/email/validate` and prints the response body. It does not send a message and it does not prove the person reads the mailbox. It does not use a different price. The cost is the cost of that HTTP call.
+
+`jane@example.com` is an example.
+
+The `routr` command is not published yet. Until then, run the `Routr.Cli` project.
+
+Set `ROUTR_API_KEY` to the API key. Set `ROUTR_BASE_URL` to the API origin. When `ROUTR_BASE_URL` is unset, the command uses `http://localhost:58167`.
+
+```bash
+routr email validate jane@example.com
+```
+
+| Flag | Meaning |
+| --- | --- |
+| `--mode` | `smart`, `cheapest`, or `pinned`. Default `smart`. |
+| `--integration` | Integration ID. Repeat it for more than one. Required when `--mode` is `pinned`. |
+| `--fallback` | When pinned, continue with the other vendors in smart order. |
+| `--max-credits` | Stop before a step that would exceed this many credits. |
+| `--timeout-ms` | How long each vendor may take, in milliseconds. Omit it to use each vendor's own timeout. Example: `3000`. |
+| `--idempotency-key` | Replay this key within 24 hours and get the first response again. |
+
+The process exits 0 when the HTTP status is 200. Any other status exits 1 and still prints the error body. When the response includes `Retry-After`, the command prints `Retry-After:` and the seconds on standard error. `retryable: true` means wait and retry. The command does not retry.

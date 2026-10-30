@@ -1,0 +1,35 @@
+---
+title: "MCP"
+description: "Call email validation from an MCP client."
+---
+
+Agents call `https://mcp.routr.to/mcp`. `https://api.routr.to/mcp` is the same API. It does not use a different price. The cost of `email_validate` is the cost of `POST /v1/email/validate`.
+
+The transport is streamable HTTP with no session.
+
+```json
+{
+  "mcpServers": {
+    "routr": {
+      "url": "https://mcp.routr.to/mcp",
+      "headers": {
+        "Authorization": "Bearer rtr_test_your_key"
+      }
+    }
+  }
+}
+```
+
+Send `Authorization: Bearer` with the same API key. The tool is `email_validate`.
+
+| Argument | Required | Meaning |
+| --- | --- | --- |
+| `email` | yes | Address to check. `jane@example.com` is an example. |
+| `mode` | no | `smart`, `cheapest`, or `pinned`. Default `smart`. |
+| `integrations` | no | Integration IDs. Required when `mode` is `pinned`. |
+| `fallback` | no | When pinned, continue with the other vendors in smart order. Default false. |
+| `max_credits` | no | Stop before a step that would exceed this many credits. |
+| `timeout_ms` | no | How long each vendor may take, in milliseconds. Omit it to use each vendor's own timeout. Example: `3000`. |
+| `idempotency_key` | no | Replay this key within 24 hours and get the first response again. |
+
+A success result is the HTTP response body. An error result is the HTTP error body, with `error.code`, `error.message`, and `error.retryable`. The MCP result has no HTTP status and no `Retry-After`. `retryable: true` means wait and retry.
